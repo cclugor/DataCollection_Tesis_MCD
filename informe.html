@@ -367,6 +367,7 @@ Interruption Frequency Index) en redes de distribución eléctrica de una
 empresa de energía en el Norte de Santander.</p>
 <h1 id="fuentes-de-información">Fuentes de información:</h1>
 <ul>
+<li>Base regultoria de Activos - (BRAE)</li>
 <li>Sistema de Gestion de Interrupciones - Outage Management System
 (OMS)</li>
 <li>Sistema de información Geografica - Geographic Information System
@@ -394,39 +395,32 @@ partir de dicha fecha.</li>
 esquemas de datos (nombres de campos, codificaciones, granularidad) que
 fueron consideradas durante el proceso de integración y homologación de
 la información.</p>
-<h2
-id="ejemplo-de-consulta_1-sql-extracción-de-eventos-de-interrupción">Ejemplo
-de consulta_1 SQL — Extracción de eventos de interrupción</h2>
-<p>A continuación se muestra un ejemplo representativo de la consulta
-utilizada para extraer los eventos de interrupción del sistema OMS
-Energy:</p>
+<h2 id="consulta_1-sql-extracción-de-eventos-de-interrupción">Consulta_1
+SQL — Extracción de eventos de interrupción</h2>
+<p>A continuación se muestra la información de evento extraida de la
+base regulatoria e historica del OR, base de datos BRAE:</p>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> FDD_CODIGOEVENTO <span class="kw">AS</span> ID_EVENTO</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>      ,FDD_FINICIAL <span class="kw">AS</span> FECHA_INICIO</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>      ,FDD_FFINAL <span class="kw">AS</span> FECHA_FIN</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      ,<span class="st">&#39;&#39;</span> <span class="kw">AS</span> ELEMENTO_FALLADO</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>      ,FDD_CODIGOELEMENTO <span class="kw">AS</span> ELEMENTO_AFECTADO</span>
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> FDD_CODIGOEVENTO <span class="kw">AS</span> ID_EVENTO</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>      ,FDD_FINICIAL <span class="kw">AS</span> FECHA_DESCONEXION</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>      ,FDD_FFINAL <span class="kw">AS</span> FECHA_CONEXION</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>      ,<span class="st">&#39;&#39;</span> <span class="kw">AS</span> ELEMENTO_FALLADO</span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> BRAE.QA_TFDDREGISTRO</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="fu">TO_CHAR</span>(FDD_FINICIAL,<span class="st">&#39;YYYY&#39;</span>) <span class="kw">IN</span> (<span class="st">&#39;2021&#39;</span>, <span class="st">&#39;2022&#39;</span>, <span class="st">&#39;2023&#39;</span>, <span class="st">&#39;2024&#39;</span>, <span class="st">&#39;2025&#39;</span>)  </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> FDD_EXCLUSION <span class="op">=</span> <span class="st">&#39;NO EXCLUIDA&#39;</span></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> FDD_CAUSA_SSPD <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="dv">1</span>)</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> FDD_FFINAL <span class="kw">IS</span> <span class="kw">NOT</span> <span class="kw">NULL</span>;</span></code></pre></div>
+<blockquote>
+<p>Esta consulta genera 95.281 registros</p>
+</blockquote>
 <p><strong>Muestra de resultados (5 registros):</strong></p>
 <table>
-<colgroup>
-<col style="width: 15%" />
-<col style="width: 18%" />
-<col style="width: 15%" />
-<col style="width: 25%" />
-<col style="width: 26%" />
-</colgroup>
 <thead>
 <tr>
 <th>ID_EVENTO</th>
-<th>FECHA_INICIO</th>
-<th>FECHA_FIN</th>
+<th>FECHA_DESCONEXION</th>
+<th>FECHA_CONEXION</th>
 <th>ELEMENTO_FALLADO</th>
-<th>ELEMENTO_AFECTADO</th>
 </tr>
 </thead>
 <tbody>
@@ -435,81 +429,500 @@ class="sourceCode sql"><code class="sourceCode sql"><span id="cb1-1"><a href="#c
 <td>14/03/21 06:59:00</td>
 <td>14/03/21 09:30:00</td>
 <td></td>
-<td>2T00469</td>
 </tr>
 <tr>
-<td>801851</td>
-<td>14/03/21 06:59:00</td>
-<td>14/03/21 09:30:00</td>
+<td>787583</td>
+<td>04/01/21 08:50:00</td>
+<td>04/01/21 17:15:00</td>
 <td></td>
-<td>2T00641</td>
 </tr>
 <tr>
-<td>801851</td>
-<td>14/03/21 06:59:00</td>
-<td>14/03/21 09:30:00</td>
+<td>787496</td>
+<td>03/01/21 14:18:14</td>
+<td>03/01/21 14:40:42</td>
 <td></td>
-<td>2T00471</td>
 </tr>
 <tr>
-<td>787355</td>
-<td>02/01/21 06:41:14</td>
-<td>02/01/21 15:00:00</td>
+<td>787232</td>
+<td>01/01/21 10:29:33</td>
+<td>01/01/21 13:30:00</td>
 <td></td>
-<td>1T04758</td>
 </tr>
 <tr>
-<td>787355</td>
-<td>02/01/21 06:41:14</td>
-<td>02/01/21 15:00:00</td>
+<td>787455</td>
+<td>03/01/21 10:34:23</td>
+<td>03/01/21 13:30:00</td>
 <td></td>
-<td>1T07090</td>
 </tr>
 </tbody>
 </table>
+<p>Se puede notar que la consulta anterior no contiene asignado el
+elemento fallado, por lo que se debe realizar una busqueda de esta
+informacion en otras fuentes, y para ello se realiza el siguiente
+procedimiento:</p>
+<h2
+id="consulta_2-sql-extracción-del-elemento-causante-de-los-eventos-y-tipo-elemento">Consulta_2
+SQL — Extracción del elemento causante de los eventos y tipo
+elemento</h2>
+<p>Se ejecuta el siguiente script, para traer de la base de datos
+SPARD-OMS los elementos fallados, se realiza esta busqueda dado que en
+la consulta anterior no se tiene asignado un elemento causante a al
+evento, esta primera parte substrae la información de la base de datos
+del sistema anterior que estuvo en operacion hasta abr-2023, sistema
+anterior OMS-SPARD de energy, por lo que exportaremos en esta consulta
+hasta la fecha de operación, para su posterior asignación:</p>
 <div class="sourceCode" id="cb2"><pre
-class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> MINICIAL <span class="kw">as</span> CODIGO_MANIOBRA, BREAKER <span class="kw">AS</span> ELEMENTO_FALLADO</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> OMS.INTERUPC</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> OMS.MANIOBRAS <span class="kw">ON</span> INTERUPC.MINICIAL <span class="op">=</span> MANIOBRAS.CODE</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="fu">TO_NUMBER</span>(<span class="fu">TO_CHAR</span>(INTERUPC.FINICIAL, <span class="st">&#39;YYYY&#39;</span>)) <span class="op">&gt;=</span> <span class="dv">2019</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> TIPO <span class="op">!=</span> <span class="st">&#39;PRUEBA&#39;</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> CAUSA <span class="op">!=</span> <span class="st">&#39;PRUEBA&#39;</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> INTERUPC.TYPEEQUIP <span class="op">!=</span> <span class="st">&#39;Transformer&#39;</span>;</span></code></pre></div>
-<p><strong>Muestra de resultados (5 registros):</strong></p>
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> MINICIAL <span class="kw">as</span> CODIGO_MANIOBRA</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>, TYPEEQUIP <span class="kw">AS</span> TIPO_EQUIPO</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>, BREAKER <span class="kw">AS</span> ELEMENTO_FALLADO</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> OMS.INTERUPC@SPARD</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">LEFT</span> <span class="kw">JOIN</span> OMS.MANIOBRAS@SPARD <span class="kw">ON</span> INTERUPC.MINICIAL <span class="op">=</span> MANIOBRAS.CODE</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> <span class="fu">TO_NUMBER</span>(<span class="fu">TO_CHAR</span>(INTERUPC.FINICIAL, <span class="st">&#39;YYYY&#39;</span>)) <span class="op">&gt;=</span> <span class="dv">2019</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> TIPO <span class="op">!=</span> <span class="st">&#39;PRUEBA&#39;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> CAUSA <span class="op">!=</span> <span class="st">&#39;PRUEBA&#39;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">AND</span> INTERUPC.TYPEEQUIP <span class="op">!=</span> <span class="st">&#39;Transformer&#39;</span></span></code></pre></div>
+<blockquote>
+<p>Esta consutla genera 38.921 registros</p>
+</blockquote>
+<p><strong>Muestra de resultados (8 registros):</strong></p>
 <table>
 <thead>
 <tr>
 <th>CODIGO_MANIOBRA</th>
+<th>TIPO_ELEMENTO</th>
 <th>ELEMENTO_FALLADO</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>MAN-00412</td>
-<td>CB_NORTE_01</td>
+<td>653818</td>
+<td>MV User</td>
+<td>RC123</td>
 </tr>
 <tr>
-<td>MAN-00587</td>
-<td>CB_CENTRO_03</td>
+<td>652796</td>
+<td>MV User</td>
+<td>TIBG11</td>
 </tr>
 <tr>
-<td>MAN-00731</td>
-<td>CB_SUR_02</td>
+<td>653346</td>
+<td>MV User</td>
+<td>BELC29</td>
 </tr>
 <tr>
-<td>MAN-00865</td>
-<td>CB_ORIENTE_05</td>
+<td>650436</td>
+<td>Feeder</td>
+<td>TIBO11P</td>
 </tr>
 <tr>
-<td>MAN-01024</td>
-<td>CB_NORTE_04</td>
+<td>655095</td>
+<td>Feeder</td>
+<td>SARC1</td>
+</tr>
+<tr>
+<td>651957</td>
+<td>Feeder</td>
+<td>CONS65P</td>
+</tr>
+<tr>
+<td>655385</td>
+<td>Sourcebus</td>
+<td>ELTARRA34.5P</td>
+</tr>
+<tr>
+<td>649466</td>
+<td>Feeder</td>
+<td>PAMC2</td>
 </tr>
 </tbody>
 </table>
+<h2
+id="consulta_3-sql-extracción-del-elemento-causante-de-los-eventos-y-tipo-elemento">Consulta_3
+SQL — Extracción del elemento causante de los eventos y tipo
+elemento</h2>
+<p>Se ejecuta el siguiente script python, para traer de las archivos
+.csv existentes de datos SP7-OMS los elementos fallados, se realiza esta
+busqueda dado que en la consulta anterior no se tiene asignado un
+elemento causante a al evento, esta segunda parte substrae la
+información de los archivos del sistema actual que se encuentra en
+operacion desde abr-2023 hasta la fecha, sistema actual OMS-SP7 de
+SIEMENS, por lo que recopilaremos la información leyendo las rutas donde
+se encuentra cada archivo correspondiente a cada mes, para su posterior
+asignación:</p>
+<p><strong>Rutas de ubicación</strong></p>
+<p>Perfecto. Pega esta versión (rutas protegidas con comillas invertidas
+para que no se dañen al convertir a HTML):</p>
+<table>
+<colgroup>
+<col style="width: 100%" />
+</colgroup>
+<thead>
+<tr>
+<th>RUTA_ARCHIVOS_INSUMO_SP7</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\04. ABR 2024\Validacion 9\Consulta_Eventos_Cens_Apertura_Cierre (7).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\05. MAY 2024\Validation 9\Consulta_Eventos_Cens_Apertura_Cierre.csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\06. JUN 2024\Validation 9\Consulta_Eventos_Cens_Apertura_Cierre.csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\07. JUL 2024\Validation 23\Consulta_Eventos_Cens_Apertura_Cierre (9).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\08. AGO 2024\Validation 28\Consulta_Eventos_Cens_Apertura_Cierre (ago 2024).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\09-SEP 2024\Validacion 19\Consulta_Eventos_Cens_Apertura_Cierre (9).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\10-OCT 2024\Validacion 12\Consulta_Eventos_Cens_Apertura_Cierre (13).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\11-NOV 2024\Validación 8\Consulta_Eventos_Cens_Apertura_Cierre (10).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\12-DIC-2024\Validacion 11\Consulta_Eventos_Cens_Apertura_Cierre (13).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\01. Enero\Validación 3\Consulta_Eventos_Cens_Apertura_Cierre (13).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\02. Febrero\Validación 2\Consulta_Eventos_Cens_Apertura_Cierre (10).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\03. Marzo\Validacion 2\Consulta_Eventos_Cens_Apertura_Cierre (10).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\04. Abril\Validacion 2\Consulta_Eventos_Cens_Apertura_Cierre (11).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\05. Mayo\Validacion 4\Consulta_Eventos_Cens_Apertura_Cierre (15).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\06. Junio\Validación 6\Consulta_Eventos_Cens_Apertura_Cierre (16).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\07. Julio\Validación 5\Consulta_Eventos_Cens_Apertura_Cierre (18).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\08. Agosto\VALIDACION 9\Consulta_Eventos_Cens_Apertura_Cierre (18).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\09. Septiembre\Validacion 5\Consulta_Eventos_Cens_Apertura_Cierre (18).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\10. Octubre\validacion 8\Consulta_Eventos_Cens_Apertura_Cierre (18).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\11. Noviembre\Validacion 6\Consulta_Eventos_Cens_Apertura_Cierre (20).csv</code></td>
+</tr>
+<tr>
+<td><code>D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\12. Diciembre\Validacion 6\Consulta_Eventos_Cens_Apertura_Cierre (20).csv</code></td>
+</tr>
+</tbody>
+</table>
+<p>Se utliza el siguiente codigo python para concatenar los archivos
+teniendo en cuenta la informacion requeridad y epecifica en el contexto
+de extraccion del tipo de elemento y id del elemento causante de cada
+evento, para su posterior asignacion.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> concatenar_dfs(path_inicial<span class="op">=</span><span class="va">None</span>):</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  columnas_necesarias <span class="op">=</span> [<span class="st">&#39;Maniobra Apertura&#39;</span>, <span class="st">&#39;Tipo Elemento&#39;</span>, <span class="st">&#39;Elemento_Falla&#39;</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  dataframes <span class="op">=</span> []</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  ruta_actual <span class="op">=</span> path_inicial</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> ruta_actual:</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>      ruta_actual <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Ingrese la ruta del archivo CSV (Enter para terminar): &quot;</span>).strip()</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> ruta_actual:</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span> pd.read_csv(ruta_actual)</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>      df.columns <span class="op">=</span> df.columns.<span class="bu">str</span>.strip()</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>      df <span class="op">=</span> df[columnas_necesarias].drop_duplicates()</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>      dataframes.append(df)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f&quot;Archivo agregado: </span><span class="sc">{</span>ruta_actual<span class="sc">}</span><span class="ss"> | filas: </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> error:</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="ss">f&quot;Error al leer/procesar &#39;</span><span class="sc">{</span>ruta_actual<span class="sc">}</span><span class="ss">&#39;: </span><span class="sc">{</span>error<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>      <span class="bu">print</span>(<span class="st">&quot;Se retorna el acumulado cargado hasta ahora.&quot;</span>)</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    ruta_actual <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> <span class="kw">not</span> dataframes:</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> pd.DataFrame(columns<span class="op">=</span>columnas_necesarias)</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> pd.concat(dataframes, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> guardar_df_csv(df, ruta_salida):</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  <span class="cf">try</span>:</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>    df.to_csv(ruta_salida, index<span class="op">=</span><span class="va">False</span>, encoding<span class="op">=</span><span class="st">&quot;utf-8-sig&quot;</span>)</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Archivo concatenado guardado en: </span><span class="sc">{</span>ruta_salida<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> error:</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;No fue posible guardar el archivo &#39;</span><span class="sc">{</span>ruta_salida<span class="sc">}</span><span class="ss">&#39;: </span><span class="sc">{</span>error<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>  df <span class="op">=</span> concatenar_dfs()</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>  <span class="bu">print</span>(df.shape)</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  ruta_salida <span class="op">=</span> <span class="st">&quot;DATA/tabla_elemento_fallado_2.csv&quot;</span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  guardar_df_csv(df, ruta_salida)</span></code></pre></div>
 <blockquote>
-<p><em>Nota: Los valores mostrados son ilustrativos. Los datos reales
-provienen de la tabla <code>OMS.INTERUPC</code> del sistema OMS
-Energy.</em></p>
+<p>Se obtienen 81.340 registros</p>
 </blockquote>
+<p><strong>Muestra de resultados (5 registros):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Maniobra Apertura</th>
+<th>Tipo Elemento</th>
+<th>Elemento_Falla</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>424000000000114424</td>
+<td>Transformador de distribucion</td>
+<td>1T07942</td>
+</tr>
+<tr>
+<td>124000000000269842</td>
+<td>Fusible</td>
+<td>F1979</td>
+</tr>
+<tr>
+<td>124000000000269842</td>
+<td>Transformador de distribucion</td>
+<td>F1979</td>
+</tr>
+<tr>
+<td>124000000000273378</td>
+<td>Fusible</td>
+<td>F2004</td>
+</tr>
+<tr>
+<td>124000000000269851</td>
+<td>Fusible</td>
+<td>F2000</td>
+</tr>
+</tbody>
+</table>
+<h2
+id="consulta_4-sql-extracción-del-inventario-del-tipo-de-elemento">Consulta_4
+SQL — Extracción del inventario del tipo de elemento</h2>
+<p>Se ejecuta el siguiente script, para traer de la base de datos GTECH
+(GIS) el inventario de elementos de interrupción, para su posterior
+asignación:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode sql"><code class="sourceCode sql"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> nodo_transform_v <span class="kw">AS</span> ELEMENTO</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat <span class="kw">AS</span> LATITUD</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon <span class="kw">AS</span> LONGITUD</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>, coor_z <span class="kw">AS</span> ALTITUD</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Transformador&#39;</span> <span class="kw">AS</span> tipo </span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>, ubicacion <span class="kw">FROM</span> ccomun@gtech  c    </span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech  <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span> <span class="kw">AND</span> c.g3e_fno <span class="op">=</span> <span class="dv">20400</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> r.codigo</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>, coor_z</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Reconectador&#39;</span> <span class="kw">as</span> tipo</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>, ubicacion <span class="kw">FROM</span> ereconec_at@gtech  r    </span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech  c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> r.codigo</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon, coor_z</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Interruptor&#39;</span> <span class="kw">as</span> tipo</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>, ubicacion <span class="kw">FROM</span> einterru_at@gtech  r    </span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech  c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech  <span class="kw">USING</span> (g3e_fid)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> cu.codigo</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon, coor_z</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Cuchilla&#39;</span> <span class="kw">AS</span> tipo</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>, ubicacion </span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> ecuchill_at@gtech cu    </span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> ai.codigo</span>
+<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>, coor_z</span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Aisladero&#39;</span> <span class="kw">AS</span> tipo</span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>, ubicacion </span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> eaislade_at@gtech ai    </span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> codigo_operativo</span>
+<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon, coor_z</span>
+<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Aisladero&#39;</span> <span class="kw">AS</span> tipo</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>, ubicacion </span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> eaislade_at@gtech ai    </span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> codigo_operativo</span>
+<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon</span>
+<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>, coor_z</span>
+<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Cuchilla&#39;</span> <span class="kw">AS</span> tipo</span>
+<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>, ubicacion <span class="kw">FROM</span> ecuchill_at@gtech cu    </span>
+<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="kw">UNION</span></span>
+<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a>(<span class="kw">SELECT</span> codigo_operativo</span>
+<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a>, coor_gps_lat</span>
+<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a>, coor_gps_lon</span>
+<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a>, coor_z</span>
+<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a>, <span class="st">&#39;Interruptor&#39;</span> <span class="kw">as</span> tipo</span>
+<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a>, ubicacion </span>
+<span id="cb4-77"><a href="#cb4-77" aria-hidden="true" tabindex="-1"></a><span class="kw">FROM</span> einterru_at@gtech r    </span>
+<span id="cb4-78"><a href="#cb4-78" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> ccomun@gtech c <span class="kw">USING</span> (g3e_fid)    </span>
+<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="kw">JOIN</span> cconectividad_e@gtech <span class="kw">USING</span> (g3e_fid) </span>
+<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="kw">WHERE</span> c.estado <span class="op">=</span> <span class="st">&#39;OPERACION&#39;</span>)</span>
+<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a>;</span></code></pre></div>
+<blockquote>
+<p>Esta consutla genera 47.751 registros</p>
+</blockquote>
+<p><strong>Muestra de resultados (8 registros):</strong></p>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 19%" />
+<col style="width: 14%" />
+<col style="width: 14%" />
+</colgroup>
+<thead>
+<tr>
+<th>ELEMENTO</th>
+<th style="text-align: right;">LATITUD</th>
+<th style="text-align: right;">LONGITUD</th>
+<th style="text-align: right;">ALTITUD</th>
+<th>TIPO</th>
+<th>UBICACION</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1T00001</td>
+<td style="text-align: right;">7.917491919</td>
+<td style="text-align: right;">-72.501995422</td>
+<td style="text-align: right;">296</td>
+<td>Transformador</td>
+<td>AVE AEROPUERTO CLL 18N</td>
+</tr>
+<tr>
+<td>1T00002</td>
+<td style="text-align: right;">7.920237054</td>
+<td style="text-align: right;">-72.499636932</td>
+<td style="text-align: right;">289</td>
+<td>Transformador</td>
+<td>AV 6 23N-05 PRADOS NORTE</td>
+</tr>
+<tr>
+<td>1T00003</td>
+<td style="text-align: right;">7.920535966</td>
+<td style="text-align: right;">-72.498614081</td>
+<td style="text-align: right;">287</td>
+<td>Transformador</td>
+<td>AV LIBERTADORES 5 Y 6</td>
+</tr>
+<tr>
+<td>1T00004</td>
+<td style="text-align: right;">7.92045106</td>
+<td style="text-align: right;">-72.499581721</td>
+<td style="text-align: right;">290</td>
+<td>Transformador</td>
+<td>AVE 6 23N-25 B/PRADOS DEL NORTE</td>
+</tr>
+<tr>
+<td>1T00005</td>
+<td style="text-align: right;">7.918228719</td>
+<td style="text-align: right;">-72.493703848</td>
+<td style="text-align: right;">286</td>
+<td>Transformador</td>
+<td>AVE LBTDORES CLL 19N</td>
+</tr>
+<tr>
+<td>1T00006</td>
+<td style="text-align: right;">7.918835719</td>
+<td style="text-align: right;">-72.492650809</td>
+<td style="text-align: right;">285</td>
+<td>Transformador</td>
+<td>CL 20BN 3-108</td>
+</tr>
+<tr>
+<td>1T00007</td>
+<td style="text-align: right;">7.918644514</td>
+<td style="text-align: right;">-72.493708601</td>
+<td style="text-align: right;">285</td>
+<td>Transformador</td>
+<td>AV 3 19N-22 M GRANAHORRA</td>
+</tr>
+<tr>
+<td>1T00008</td>
+<td style="text-align: right;">7.918019396</td>
+<td style="text-align: right;">-72.492614955</td>
+<td style="text-align: right;">284</td>
+<td>Transformador</td>
+<td>AVE 4 20N-03 TASAJERO</td>
+</tr>
+</tbody>
+</table>
+<p>Para la el cruce de informacion y consolidacion de la data se
+proponen los siguientes propuestas de muestreo:</p>
+<blockquote>
+<p>por mes tomar entre 100 o 1000 datos</p>
+</blockquote>
+<blockquote>
+<p>realizar una grafica de distribucion</p>
+</blockquote>
+<blockquote>
+<p>realizar de variables meteorologicas por zonas</p>
+</blockquote>
+<h3 id="antieguedad-de-activos"><strong>Antieguedad de
+activos</strong></h3>
+<p>Para la recolección del atributo <strong>antiguedad de
+activo</strong> es mejor no tener en cuenta la antiguedad de los activos
+causantes, dado que posiblemente los activos sean nuevos pero el fallo
+se puede deber a la antiguedad de la red mas precisamente a y otros
+facotores que induce a que los elementos generen una desconexion, por lo
+que se podria buscar variables que apliquen mas a las deconexiones tales
+como:</p>
+<ul>
+<li>Antiguedad de la red</li>
+<li>Extension de la red</li>
+<li>Cantidad de transformadores</li>
+<li>Cantidad de usuarios</li>
+</ul>
 </body>
 </html>

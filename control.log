@@ -1,9 +1,0 @@
-
-SQL*Loader: Release 23.0.0.0.0 - Production on Fri Feb 20 12:25:47 2026
-Version 23.9.0.25.07
-
-Copyright (c) 1982, 2025, Oracle and/or its affiliates.  All rights reserved.
-
-SQL*Loader-500: Unable to open file (control.dat)
-SQL*Loader-553: file not found
-SQL*Loader-509: System error: El sistema no puede encontrar el archivo especificado.

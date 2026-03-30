@@ -148,16 +148,16 @@ A partir del año 2023, la Electrificadora de Norte de Santander realizó una mi
 
 Esta dualidad de fuentes implica diferencias estructurales en los esquemas de datos (nombres de campos, codificaciones, granularidad) que fueron consideradas durante el proceso de integración y homologación de la información.
 
-## Ejemplo de consulta_1 SQL — Extracción de eventos de interrupción
+## Consulta_1 SQL — Extracción de eventos de interrupción
 
-A continuación se muestra un ejemplo representativo de la consulta utilizada para extraer los eventos de interrupción del sistema OMS Energy:
+A continuación se muestra la información de evento extraida de la base regulatoria e historica del OR, base de datos BRAE:
 
 ```sql
-SELECT FDD_CODIGOEVENTO AS ID_EVENTO
-	  ,FDD_FINICIAL AS FECHA_INICIO
-	  ,FDD_FFINAL AS FECHA_FIN
+
+SELECT DISTINCT FDD_CODIGOEVENTO AS ID_EVENTO
+	  ,FDD_FINICIAL AS FECHA_DESCONEXION
+	  ,FDD_FFINAL AS FECHA_CONEXION
 	  ,'' AS ELEMENTO_FALLADO
-	  ,FDD_CODIGOELEMENTO AS ELEMENTO_AFECTADO
 FROM BRAE.QA_TFDDREGISTRO
 WHERE TO_CHAR(FDD_FINICIAL,'YYYY') IN ('2021', '2022', '2023', '2024', '2025')  
 AND FDD_EXCLUSION = 'NO EXCLUIDA'
@@ -165,39 +165,283 @@ AND FDD_CAUSA_SSPD NOT IN (1)
 AND FDD_FFINAL IS NOT NULL;
 
 ```
+>  Esta consulta genera 95.281 registros
 
 **Muestra de resultados (5 registros):**
 
-| ID_EVENTO | FECHA_INICIO | FECHA_FIN | ELEMENTO_FALLADO | ELEMENTO_AFECTADO |
-|-----------|-------------|-----------|------------------|-------------------|
-| 801851 | 14/03/21 06:59:00 | 14/03/21 09:30:00 |  | 2T00469 |
-| 801851 | 14/03/21 06:59:00 | 14/03/21 09:30:00 |  | 2T00641 |
-| 801851 | 14/03/21 06:59:00 | 14/03/21 09:30:00 |  | 2T00471 |
-| 787355 | 02/01/21 06:41:14 | 02/01/21 15:00:00 |  | 1T04758 |
-| 787355 | 02/01/21 06:41:14 | 02/01/21 15:00:00 |  | 1T07090 |
+| ID_EVENTO | FECHA_DESCONEXION | FECHA_CONEXION | ELEMENTO_FALLADO |
+|-----------|-------------------|----------------|------------------|
+| 801851 | 14/03/21 06:59:00 | 14/03/21 09:30:00 |  |
+| 787583 | 04/01/21 08:50:00 | 04/01/21 17:15:00 |  |
+| 787496 | 03/01/21 14:18:14 | 03/01/21 14:40:42 |  |
+| 787232 | 01/01/21 10:29:33 | 01/01/21 13:30:00 |  |
+| 787455 | 03/01/21 10:34:23 | 03/01/21 13:30:00 |  |
 
 
+
+Se puede notar que la consulta anterior no contiene asignado el elemento fallado, por lo que se debe realizar una busqueda de esta informacion en otras fuentes, y para ello se realiza el siguiente procedimiento:
+
+
+## Consulta_2 SQL — Extracción del elemento causante de los eventos y tipo elemento
+
+Se ejecuta el siguiente script, para traer de la base de datos SPARD-OMS los elementos fallados, se realiza esta busqueda dado que en la consulta anterior no se tiene asignado un elemento causante a al evento, esta primera parte substrae la información de la base de datos del sistema anterior que estuvo en operacion hasta abr-2023, sistema anterior OMS-SPARD de energy, por lo que exportaremos en esta consulta hasta la fecha de operación, para su posterior asignación:
 
 ```sql
-SELECT DISTINCT MINICIAL as CODIGO_MANIOBRA, BREAKER AS ELEMENTO_FALLADO
-FROM OMS.INTERUPC
-LEFT JOIN OMS.MANIOBRAS ON INTERUPC.MINICIAL = MANIOBRAS.CODE
+
+SELECT DISTINCT MINICIAL as CODIGO_MANIOBRA
+, TYPEEQUIP AS TIPO_EQUIPO
+, BREAKER AS ELEMENTO_FALLADO
+FROM OMS.INTERUPC@SPARD
+LEFT JOIN OMS.MANIOBRAS@SPARD ON INTERUPC.MINICIAL = MANIOBRAS.CODE
 WHERE TO_NUMBER(TO_CHAR(INTERUPC.FINICIAL, 'YYYY')) >= 2019
 AND TIPO != 'PRUEBA'
 AND CAUSA != 'PRUEBA'
-AND INTERUPC.TYPEEQUIP != 'Transformer';
+AND INTERUPC.TYPEEQUIP != 'Transformer'
 
 ```
+> Esta consutla genera 38.921 registros
+
+
+**Muestra de resultados (8 registros):**
+
+
+| CODIGO_MANIOBRA | TIPO_ELEMENTO | ELEMENTO_FALLADO | 
+|-----------------|---------------|------------------|
+| 653818 | MV User | RC123 |
+| 652796 | MV User	| TIBG11 |
+| 653346	| MV User |	BELC29 |
+| 650436	 | Feeder |	TIBO11P |
+| 655095	| Feeder |	SARC1 |
+| 651957	| Feeder |	CONS65P |
+| 655385	| Sourcebus |	ELTARRA34.5P |
+| 649466 | Feeder |	PAMC2 |
+
+
+## Consulta_3 SQL — Extracción del elemento causante de los eventos y tipo elemento
+
+Se ejecuta el siguiente script python, para traer de las archivos .csv existentes de datos SP7-OMS los elementos fallados, se realiza esta busqueda dado que en la consulta anterior no se tiene asignado un elemento causante a al evento, esta segunda parte substrae la información de los archivos del sistema actual que se encuentra en operacion desde abr-2023 hasta la fecha, sistema actual OMS-SP7 de SIEMENS, por lo que recopilaremos la información leyendo las rutas donde se encuentra cada archivo correspondiente a cada mes, para su posterior asignación:
+
+**Rutas de ubicación**
+
+Perfecto. Pega esta versión (rutas protegidas con comillas invertidas para que no se dañen al convertir a HTML):
+
+| RUTA_ARCHIVOS_INSUMO_SP7 |
+|---|
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\04. ABR 2024\Validacion 9\Consulta_Eventos_Cens_Apertura_Cierre (7).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\05. MAY 2024\Validation 9\Consulta_Eventos_Cens_Apertura_Cierre.csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\06. JUN 2024\Validation 9\Consulta_Eventos_Cens_Apertura_Cierre.csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\07. JUL 2024\Validation 23\Consulta_Eventos_Cens_Apertura_Cierre (9).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\08. AGO 2024\Validation 28\Consulta_Eventos_Cens_Apertura_Cierre (ago 2024).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\09-SEP 2024\Validacion 19\Consulta_Eventos_Cens_Apertura_Cierre (9).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\10-OCT 2024\Validacion 12\Consulta_Eventos_Cens_Apertura_Cierre (13).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\11-NOV 2024\Validación 8\Consulta_Eventos_Cens_Apertura_Cierre (10).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2024\12-DIC-2024\Validacion 11\Consulta_Eventos_Cens_Apertura_Cierre (13).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\01. Enero\Validación 3\Consulta_Eventos_Cens_Apertura_Cierre (13).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\02. Febrero\Validación 2\Consulta_Eventos_Cens_Apertura_Cierre (10).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\03. Marzo\Validacion 2\Consulta_Eventos_Cens_Apertura_Cierre (10).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\04. Abril\Validacion 2\Consulta_Eventos_Cens_Apertura_Cierre (11).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\05. Mayo\Validacion 4\Consulta_Eventos_Cens_Apertura_Cierre (15).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\06. Junio\Validación 6\Consulta_Eventos_Cens_Apertura_Cierre (16).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\07. Julio\Validación 5\Consulta_Eventos_Cens_Apertura_Cierre (18).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\08. Agosto\VALIDACION 9\Consulta_Eventos_Cens_Apertura_Cierre (18).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\09. Septiembre\Validacion 5\Consulta_Eventos_Cens_Apertura_Cierre (18).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\10. Octubre\validacion 8\Consulta_Eventos_Cens_Apertura_Cierre (18).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\11. Noviembre\Validacion 6\Consulta_Eventos_Cens_Apertura_Cierre (20).csv` |
+| `D:\OneDrive - Grupo EPM\1-OPERACION Y CALIDADAD\QEnergia\REPORTES MM\2025\12. Diciembre\Validacion 6\Consulta_Eventos_Cens_Apertura_Cierre (20).csv` |
+
+
+Se utliza el siguiente codigo python para concatenar los archivos teniendo en cuenta la informacion requeridad y epecifica en el contexto de extraccion del tipo de elemento y id del elemento causante de cada evento, para su posterior asignacion.
+
+```python
+import pandas as pd
+
+def concatenar_dfs(path_inicial=None):
+  columnas_necesarias = ['Maniobra Apertura', 'Tipo Elemento', 'Elemento_Falla']
+  dataframes = []
+
+  ruta_actual = path_inicial
+
+  while True:
+    if not ruta_actual:
+      ruta_actual = input("Ingrese la ruta del archivo CSV (Enter para terminar): ").strip()
+
+    if not ruta_actual:
+      break
+
+    try:
+      df = pd.read_csv(ruta_actual)
+      df.columns = df.columns.str.strip()
+      df = df[columnas_necesarias].drop_duplicates()
+      dataframes.append(df)
+      print(f"Archivo agregado: {ruta_actual} | filas: {len(df)}")
+    except Exception as error:
+      print(f"Error al leer/procesar '{ruta_actual}': {error}")
+      print("Se retorna el acumulado cargado hasta ahora.")
+      break
+
+    ruta_actual = None
+
+  if not dataframes:
+    return pd.DataFrame(columns=columnas_necesarias)
+
+  return pd.concat(dataframes, ignore_index=True)
+
+
+def guardar_df_csv(df, ruta_salida):
+  try:
+    df.to_csv(ruta_salida, index=False, encoding="utf-8-sig")
+    print(f"Archivo concatenado guardado en: {ruta_salida}")
+  except Exception as error:
+    print(f"No fue posible guardar el archivo '{ruta_salida}': {error}")
+
+
+if __name__ == "__main__":
+  df = concatenar_dfs()
+  print(df.shape)
+  ruta_salida = "DATA/tabla_elemento_fallado_2.csv"
+  guardar_df_csv(df, ruta_salida)
+
+```
+> Se obtienen 81.340 registros
+
 
 **Muestra de resultados (5 registros):**
 
-| CODIGO_MANIOBRA | ELEMENTO_FALLADO |
-|-----------------|------------------|
-| MAN-00412 | CB_NORTE_01 |
-| MAN-00587 | CB_CENTRO_03 |
-| MAN-00731 | CB_SUR_02 |
-| MAN-00865 | CB_ORIENTE_05 |
-| MAN-01024 | CB_NORTE_04 |
+| Maniobra Apertura | Tipo Elemento | Elemento_Falla |
+|---|---|---|
+| 424000000000114424 | Transformador de distribucion | 1T07942 |
+| 124000000000269842 | Fusible | F1979 |
+| 124000000000269842 | Transformador de distribucion | F1979 |
+| 124000000000273378 | Fusible | F2004 |
+| 124000000000269851 | Fusible | F2000 |
 
-> *Nota: Los valores mostrados son ilustrativos. Los datos reales provienen de la tabla `OMS.INTERUPC` del sistema OMS Energy.*
+
+
+
+## Consulta_4 SQL — Extracción del inventario del tipo de elemento
+
+Se ejecuta el siguiente script, para traer de la base de datos GTECH (GIS) el inventario de elementos de interrupción, para su posterior asignación:
+
+```sql
+
+(SELECT nodo_transform_v AS ELEMENTO
+, coor_gps_lat AS LATITUD
+, coor_gps_lon AS LONGITUD
+, coor_z AS ALTITUD
+, 'Transformador' AS tipo 
+, ubicacion FROM ccomun@gtech  c    
+JOIN cconectividad_e@gtech  USING (g3e_fid) 
+WHERE c.estado = 'OPERACION' AND c.g3e_fno = 20400)
+UNION
+(SELECT r.codigo
+, coor_gps_lat
+, coor_gps_lon
+, coor_z
+, 'Reconectador' as tipo
+, ubicacion FROM ereconec_at@gtech  r    
+JOIN ccomun@gtech  c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid) 
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT r.codigo
+, coor_gps_lat
+, coor_gps_lon, coor_z
+, 'Interruptor' as tipo
+, ubicacion FROM einterru_at@gtech  r    
+JOIN ccomun@gtech  c USING (g3e_fid)    
+JOIN cconectividad_e@gtech  USING (g3e_fid)
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT cu.codigo
+, coor_gps_lat
+, coor_gps_lon, coor_z
+, 'Cuchilla' AS tipo
+, ubicacion 
+FROM ecuchill_at@gtech cu    
+JOIN ccomun@gtech c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid) 
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT ai.codigo
+, coor_gps_lat
+, coor_gps_lon
+, coor_z
+, 'Aisladero' AS tipo
+, ubicacion 
+FROM eaislade_at@gtech ai    
+JOIN ccomun@gtech c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid)
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT codigo_operativo
+, coor_gps_lat
+, coor_gps_lon, coor_z
+, 'Aisladero' AS tipo
+, ubicacion 
+FROM eaislade_at@gtech ai    
+JOIN ccomun@gtech c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid) 
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT codigo_operativo
+, coor_gps_lat
+, coor_gps_lon
+, coor_z
+, 'Cuchilla' AS tipo
+, ubicacion FROM ecuchill_at@gtech cu    
+JOIN ccomun@gtech c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid) 
+WHERE c.estado = 'OPERACION')
+UNION
+(SELECT codigo_operativo
+, coor_gps_lat
+, coor_gps_lon
+, coor_z
+, 'Interruptor' as tipo
+, ubicacion 
+FROM einterru_at@gtech r    
+JOIN ccomun@gtech c USING (g3e_fid)    
+JOIN cconectividad_e@gtech USING (g3e_fid) 
+WHERE c.estado = 'OPERACION')
+;
+
+```
+> Esta consutla genera 47.751 registros
+
+
+**Muestra de resultados (8 registros):**
+
+| ELEMENTO | LATITUD | LONGITUD | ALTITUD | TIPO | UBICACION |
+|---|---:|---:|---:|---|---|
+| 1T00001 | 7.917491919 | -72.501995422 | 296 | Transformador | AVE AEROPUERTO CLL 18N |
+| 1T00002 | 7.920237054 | -72.499636932 | 289 | Transformador | AV 6  23N-05 PRADOS NORTE |
+| 1T00003 | 7.920535966 | -72.498614081 | 287 | Transformador | AV LIBERTADORES 5 Y 6 |
+| 1T00004 | 7.92045106 | -72.499581721 | 290 | Transformador | AVE 6 23N-25 B/PRADOS DEL NORTE |
+| 1T00005 | 7.918228719 | -72.493703848 | 286 | Transformador | AVE LBTDORES CLL 19N |
+| 1T00006 | 7.918835719 | -72.492650809 | 285 | Transformador | CL 20BN 3-108 |
+| 1T00007 | 7.918644514 | -72.493708601 | 285 | Transformador | AV 3 19N-22 M GRANAHORRA |
+| 1T00008 | 7.918019396 | -72.492614955 | 284 | Transformador | AVE 4  20N-03 TASAJERO |
+
+
+
+Para la el cruce de informacion y consolidacion de la data se proponen los siguientes propuestas de muestreo:
+
+> por mes tomar entre 100 o 1000 datos 
+
+> realizar una grafica de distribucion
+
+> realizar de variables meteorologicas por zonas
+
+> Agrupacion de zonas antes de asignar variables meteorologicas
+
+### **Antieguedad de activos**
+
+Para la recolección del atributo **antiguedad de activo** es mejor no tener en cuenta la antiguedad de los activos causantes, dado que posiblemente los activos sean nuevos pero el fallo se puede deber a la antiguedad de la red mas precisamente a y otros facotores que induce a que los elementos generen una desconexion, por lo que se podria buscar variables que apliquen mas a las deconexiones tales como:
+
+- Antiguedad de la red 
+- Extension de la red
+- Cantidad de transformadores
+- Cantidad de usuarios
+
+
 
