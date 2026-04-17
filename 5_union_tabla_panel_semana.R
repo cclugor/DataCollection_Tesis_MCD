@@ -285,7 +285,11 @@ anim_save("C:/Users/User/Downloads/fallas_animacion.gif", animacion)
   shadow_mark(alpha = 0.1) +   # deja “rastro”
   ease_aes("linear")
   
+<<<<<<< Updated upstream
 # 🧠 Interpretación (esto lo puedes decir en la sustentación)
+=======
+# 🧠 Interpretación
+>>>>>>> Stashed changes
 # 
 # La animación permite observar:
 #   
