@@ -230,3 +230,11 @@ ggplot(clima_tiempo_long, aes(x = semana, y = valor, color = variable)) +
     alpha = 0.2
   )
 
+<<<<<<< Updated upstream:3_cargue_tablas_nasa_semana.R
+=======
+
+
+
+
+
+>>>>>>> Stashed changes:Scripts/Cindy/3_cargue_tablas_nasa_semana.R

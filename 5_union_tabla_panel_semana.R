@@ -69,6 +69,7 @@ ggplot(fallas_tiempo, aes(x = semana, y = total_eventos)) +
     x = "Semana",
     y = "Número de eventos"
   )
+
 #🌍 6.2 Distribución espacial de fallas
 fallas_mapa <- panel_semana %>%
   group_by(id_cuadrante, latitud, longitud) %>%
@@ -83,8 +84,10 @@ ggplot(fallas_mapa, aes(x = longitud, y = latitud)) +
   scale_color_viridis_c() +
   theme_minimal() +
   labs(title = "Probabilidad de falla por cuadrante")
+
 #🌧️ 6.3 Relación clima–fallas
-ggplot(panel_semana %>% slice_sample(n=1500), aes(x = precip_total_semana, y = n_eventos)) +
+ggplot(panel_semana %>% 
+         slice_sample(n=1500), aes(x = precip_total_semana, y = n_eventos)) +
   geom_point(alpha = 0.2, color = "#1f78b4") +
   geom_smooth(method = "lm", color = "black") +
   theme_minimal() +
@@ -145,7 +148,7 @@ ggplot(
     slice_sample(n = 2000) %>%
     filter(semana >= as.Date("2025-10-01")) %>%
     mutate(
-      mes = floor_date(semana, "month")
+      mes = factor(floor_date(semana, "month"))
     ),
   aes(x = longitud, y = latitud)
 ) +
@@ -171,7 +174,7 @@ ggplot(
     slice_sample(n = 2000) %>%
     filter(semana >= as.Date("2025-10-01")) %>%
     mutate(
-      mes = factor(floor_date(semana, "month"))
+      mes = format(floor_date(semana, "month"), "%Y-%m")
     ),
   aes(x = longitud, y = latitud)
 ) +
@@ -255,7 +258,7 @@ animacion <- ggplot(
 animate(animacion, nframes = 80, fps = 8, width = 800, height = 600)
 #💾 5. Guardar (IMPORTANTE para tu tesis)
 anim_save("C:/Users/User/Downloads/fallas_animacion.gif", animacion)
-#🔥 6. Versión MEJORADA (más limpia visualmente)
+#🔥 6. Versión mejorada
 
 # Esta es la que te recomiendo para presentación:
   
