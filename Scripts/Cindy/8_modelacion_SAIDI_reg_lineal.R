@@ -53,21 +53,25 @@ wf_base <- workflow() %>%
   add_model(lm_spec)
 
 fit_base <- fit(wf_base, data = df_base)
-2.4 Resultados
+
+# 2.4 Resultados
 summary(extract_fit_parsnip(fit_base)$fit)
-2.5 Selección de variables
+
+#2.5 Selección de variables
+
 modelo_step_base <- step(
   extract_fit_parsnip(fit_base)$fit,
   direction = "both"
 )
 
 summary(modelo_step_base)
-2.6 Diagnóstico de supuestos
-Residuos vs ajustados
+# 2.6 Diagnóstico de supuestos
+# Residuos vs ajustados
 plot(modelo_step_base, which = 1)
-Normalidad
+# Normalidad
 plot(modelo_step_base, which = 2)
-2.7 Evaluación
+
+# 2.7 Evaluación
 pred_base <- predict(modelo_step_base, df_base)
 
 rmse_base <- rmse(df_base$SAIDI, pred_base)
@@ -75,27 +79,27 @@ mae_base  <- mae(df_base$SAIDI, pred_base)
 r2_base   <- summary(modelo_step_base)$r.squared
 
 
-7. Limitaciones del modelo
+# 7. Limitaciones del modelo
 
-El modelo base presenta varias limitaciones relevantes:
-  
-  Bajo poder explicativo (R² reducido), lo que indica que una gran proporción de la variabilidad de SAIDI no es capturada.
-Ausencia de dinámica temporal, ignorando la persistencia en la duración de las interrupciones.
-Posible omisión de efectos diferidos del clima sobre la infraestructura eléctrica.
-Alta variabilidad de los errores, asociada a eventos extremos no modelados.
+# El modelo base presenta varias limitaciones relevantes:
+#   
+# Bajo poder explicativo (R² reducido), lo que indica que una gran proporción de la variabilidad de SAIDI no es capturada.
+# Ausencia de dinámica temporal, ignorando la persistencia en la duración de las interrupciones.
+# Posible omisión de efectos diferidos del clima sobre la infraestructura eléctrica.
+# Alta variabilidad de los errores, asociada a eventos extremos no modelados.
+# 
+# Estas limitaciones sugieren la necesidad de incorporar estructuras más complejas.
 
-Estas limitaciones sugieren la necesidad de incorporar estructuras más complejas.
-
-8. Conclusión
-
-El modelo base constituye una referencia inicial para el análisis de SAIDI. Los resultados evidencian que las variables contemporáneas por sí solas tienen una capacidad limitada para explicar la duración de las interrupciones, lo cual justifica la incorporación de rezagos temporales y modelos dinámicos en los siguientes capítulos.
-
-
+# 8. Conclusión
+# 
+# El modelo base constituye una referencia inicial para el análisis de SAIDI. Los resultados evidencian que las variables contemporáneas por sí solas tienen una capacidad limitada para explicar la duración de las interrupciones, lo cual justifica la incorporación de rezagos temporales y modelos dinámicos en los siguientes capítulos.
 
 
-
-🔹 3. Modelo con rezagos
-3.1 Preparación de datos
+# 
+# 
+# 
+# 🔹 3. Modelo con rezagos
+# 3.1 Preparación de datos
 df_lags <- panel_semana %>%
   select(
     SAIDI,
@@ -104,18 +108,18 @@ df_lags <- panel_semana %>%
     lluvia_lag2, viento_lag1
   ) %>%
   na.omit()
-3.2 Recipe
+# 3.2 Recipe
 rec_lags <- recipe(SAIDI ~ ., data = df_lags) %>%
   step_normalize(all_predictors())
-3.3 Modelo
+# 3.3 Modelo
 wf_lags <- workflow() %>%
   add_recipe(rec_lags) %>%
   add_model(lm_spec)
 
 fit_lags <- fit(wf_lags, data = df_lags)
-3.4 Resultados
+# 3.4 Resultados
 summary(extract_fit_parsnip(fit_lags)$fit)
-3.5 Selección de variables
+# 3.5 Selección de variables
 modelo_step_lags <- step(
   extract_fit_parsnip(fit_lags)$fit,
   direction = "both"
