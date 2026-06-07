@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Data Collection — Informes del proyecto</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #1e40af;
+      --accent-hover: #1d4ed8;
+      --border: #e5e7eb;
+      --tag-bg: #eff6ff;
+      --tag-text: #1e40af;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .wrap {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 3rem;
+    }
+
+    header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    h1 {
+      margin: 0 0 0.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .note {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      background: var(--tag-bg);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+
+    h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .section-desc {
+      margin: 0 0 1rem;
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    ul.reports {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .report-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .report-card:hover {
+      border-color: #bfdbfe;
+      box-shadow: 0 4px 14px rgba(30, 64, 175, 0.08);
+    }
+
+    .report-card a {
+      display: block;
+      padding: 1rem 1.15rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .report-title {
+      display: block;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.25rem;
+    }
+
+    .report-card a:hover .report-title {
+      color: var(--accent-hover);
+      text-decoration: underline;
+    }
+
+    .report-meta {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      font-family: Consolas, "Courier New", monospace;
+      word-break: break-all;
+    }
+
+    .report-desc {
+      display: block;
+      margin-top: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 0.45rem;
+      padding: 0.15rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      border-radius: 4px;
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    footer code {
+      background: #f3f4f6;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      font-size: 0.82rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Data Collection — Tesis MCD</h1>
+      <p class="subtitle">
+        Índice de informes HTML reproducibles (CRISP-DM · panel activo × día · Norte de Santander)
+      </p>
+      <p class="note">
+        Esta página centraliza los reportes generados desde R Markdown. Los enlaces son rutas
+        relativas al repositorio para publicación en <strong>GitHub Pages</strong> o referencia
+        en el documento de la tesis.
+      </p>
+    </header>
+
+    <section id="etapa-2">
+      <h2>Etapa 2 — Integración y depuración</h2>
+      <p class="section-desc">
+        Construcción del panel consolidado <code>data_consolidada.csv</code> y agregación por cuadrante y semana.
+      </p>
+      <ul class="reports">
+        <li class="report-card">
+          <a href="Scripts/Edwin/Consolidada.html">
+            <span class="report-title">Consolidación de la información</span>
+            <span class="report-meta">Scripts/Edwin/Consolidada.html</span>
+            <span class="report-desc">
+              Pipeline de integración (pasos 5.2.1.4–5.2.1.8): calendario, severidad, clima,
+              DURACION y FRECUENCIA sobre el grano activo × día.
+            </span>
+            <span class="tag">Consolidada.Rmd</span>
+          </a>
+        </li>
+        <li class="report-card">
+          <a href="Scripts/Cindy/data_agrupacion.html">
+            <span class="report-title">Construcción de tabla agregada por cuadrante y semana</span>
+            <span class="report-meta">Scripts/Cindy/data_agrupacion.html</span>
+            <span class="report-desc">
+              Agregación del panel consolidado a grano cuadrante × semana: variables climáticas,
+              usuarios y elementos afectados, frecuencia y duración. Exporta
+              <code>data_agrupada_por_cuadrante_semana.csv</code>.
+            </span>
+            <span class="tag">data_agrupacion.Rmd</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section id="etapa-3">
+      <h2>Etapa 3 — Análisis exploratorio (EDA)</h2>
+      <p class="section-desc">Diagnóstico de calidad, extremos y estadísticos descriptivos del panel.</p>
+      <ul class="reports">
+        <li class="report-card">
+          <a href="Scripts/Edwin/identificacion_datos_faltantes.html">
+            <span class="report-title">Identificación de datos faltantes</span>
+            <span class="report-meta">Scripts/Edwin/identificacion_datos_faltantes.html</span>
+            <span class="report-desc">
+              Sección 5.3.1 — Conteo de NA por variable y por fila en el panel consolidado.
+            </span>
+            <span class="tag">§ 5.3.1</span>
+          </a>
+        </li>
+        <li class="report-card">
+          <a href="Scripts/Edwin/detection_outliers.html">
+            <span class="report-title">Identificación de valores extremos</span>
+            <span class="report-meta">Scripts/Edwin/detection_outliers.html</span>
+            <span class="report-desc">
+              Sección 5.3.2 — Reglas IQR y percentiles; boxplots e histogramas (clima y días con evento).
+            </span>
+            <span class="tag">§ 5.3.2</span>
+          </a>
+        </li>
+        <li class="report-card">
+          <a href="Scripts/Edwin/calculo_estadistico_descriptivo.html">
+            <span class="report-title">Cálculo de estadísticos descriptivos</span>
+            <span class="report-meta">Scripts/Edwin/calculo_estadistico_descriptivo.html</span>
+            <span class="report-desc">
+              Sección 5.3.3 — Medidas de tendencia central, dispersión, % ceros y frecuencias por TIPO.
+            </span>
+            <span class="tag">§ 5.3.3</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section id="documentacion">
+      <h2>Documentación y recolección</h2>
+      <p class="section-desc">Informes metodológicos complementarios del proyecto.</p>
+      <ul class="reports">
+        <li class="report-card">
+          <a href="Scripts/Edwin/informe.html">
+            <span class="report-title">Recopilación de información del proyecto</span>
+            <span class="report-meta">Scripts/Edwin/informe.html</span>
+            <span class="report-desc">
+              Documentación general de fuentes, extracción y lineamiento de datos del proyecto.
+            </span>
+          </a>
+        </li>
+        <li class="report-card">
+          <a href="Scripts/Edwin/Documentacion/informe_recoleccion.html">
+            <span class="report-title">Informe de recolección de datos</span>
+            <span class="report-meta">Scripts/Edwin/Documentacion/informe_recoleccion.html</span>
+            <span class="report-desc">
+              Detalle de sistemas, variables y lógica de construcción del dataset consolidado.
+            </span>
+            <span class="tag">informe_recoleccion.Rmd</span>
+          </a>
+        </li>
+      </ul>
+    </section>
+
+    <section id="proximos">
+      <h2>Próximos informes</h2>
+      <p class="section-desc">
+        Agregar aquí nuevos enlaces cuando se generen reportes HTML (p. ej. § 5.3.4 distribución,
+        § 5.3.5 temporal, correlaciones). Copiar una tarjeta <code>&lt;li class="report-card"&gt;</code>
+        de las secciones anteriores.
+      </p>
+      <ul class="reports">
+        <!-- Ejemplo para futuros informes:
+        <li class="report-card">
+          <a href="Scripts/Edwin/analisis_distribucion_variables.html">
+            <span class="report-title">Análisis de la distribución de variables</span>
+            <span class="report-meta">Scripts/Edwin/analisis_distribucion_variables.html</span>
+            <span class="report-desc">Sección 5.3.4 — Forma de distribuciones y recomendaciones de transformación.</span>
+            <span class="tag">§ 5.3.4</span>
+          </a>
+        </li>
+        -->
+      </ul>
+    </section>
+
+    <footer>
+      <p>
+        Repositorio: <strong>DataCollection_Tesis_MCD</strong> ·
+        Para GitHub Pages: activar Pages en <em>Settings → Pages</em>, origen <code>main</code> /
+        carpeta raíz (<code>/ (root)</code>). La URL base será
+        <code>https://&lt;usuario&gt;.github.io/DataCollection_Tesis_MCD/</code>
+      </p>
+      <p>
+        En LaTeX, enlazar con
+        <code>\url{https://esilvas1.github.io/DataCollection_Tesis_MCD/}</code>
+        o al informe concreto, p. ej.
+        <code>.../Scripts/Edwin/calculo_estadistico_descriptivo.html</code>
+      </p>
+    </footer>
+  </div>
+</body>
+</html>

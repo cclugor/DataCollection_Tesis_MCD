@@ -1,0 +1,200 @@
+---
+title: "Construcción de tabla agregada por cuadrante y semana"
+author: "Cindy Lugo"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# Construcción de tabla agregada por cuadrante y semana
+
+Panel consolidado **activo × día** (`data_consolidada.csv`).  
+Referencia metodológica: $N = A \times T = 47\,649 \times 1\,826 = 87\,007\,074$ filas.
+
+```{r setup}
+library(tidyverse)
+```
+
+```{r entorno}
+env_path <- file.path("..", "..", ".env")
+if (file.exists(".env")) {
+  readRenviron(".env")
+} else if (file.exists(env_path)) {
+  readRenviron(env_path)
+}
+
+UBICACION_DATA <- Sys.getenv("UBICACION_DATA")
+if (UBICACION_DATA == "") {
+  stop("UBICACION_DATA no esta definida. Verifica el archivo .env.")
+}
+
+path_consolidada <- file.path(UBICACION_DATA, "data_consolidada.csv")
+if (!file.exists(path_consolidada)) {
+  stop("No se encontro: ", path_consolidada)
+}
+```
+
+```{r lectura}
+message("Leyendo panel consolidado (puede tardar varios minutos)...")
+tabla_base_consolidada <- read_csv(path_consolidada, show_col_types = FALSE
+  #n_max = 20
+  )
+
+dim(tabla_base_consolidada)
+```
+
+
+```{r}
+head(tabla_base_consolidada)
+```
+
+
+# CONTIENE ID DE CUADRANTE Y LAT LONG DE LOS CENTROIDES
+
+```{r}
+
+
+library(readxl)
+CUADRANTE_CORD_800 <- read_excel(
+  file.path(UBICACION_DATA, "Distribución de Cuadrantes", "CUADRANTE_CORD_800.xls")
+)
+head(CUADRANTE_CORD_800)
+```
+
+```{r}
+
+elementos_coord <- tabla_base_consolidada %>%
+  select(ELEMENTO, LATITUD, LONGITUD) %>%
+  distinct()
+
+names(tabla_base_consolidada)
+
+```
+
+```{r}
+
+ELEMENTO_FALLA_CUADRANTE_800 <- read_excel(
+  file.path(UBICACION_DATA, "Distribución de Cuadrantes", "ELEMENTO_FALLA_CUADRANTE_800.xls")
+)
+head(ELEMENTO_FALLA_CUADRANTE_800)
+```
+
+
+```{r}
+elemento_cuadrante <- ELEMENTO_FALLA_CUADRANTE_800 %>%
+  select(ELEMENTO, CUADRANTE_1) %>%
+  distinct() %>%
+  rename(
+    id_cuadrante = CUADRANTE_1
+  )
+
+```
+
+```{r}
+nrow(elemento_cuadrante)
+n_distinct(elemento_cuadrante$ELEMENTO)
+```
+
+```{r}
+tabla_base_consolidada <- tabla_base_consolidada %>%
+  left_join(
+    elemento_cuadrante,
+    by = "ELEMENTO"
+  )
+```
+
+
+```{r}
+sum(is.na(tabla_base_consolidada$id_cuadrante))
+```
+```{r}
+
+library(dplyr)
+library(lubridate)
+ 
+eventos_cuadrante_semana <- tabla_base_consolidada %>%
+ mutate(
+   semana = floor_date(
+     FECHA_DIA,
+     unit = "week",
+     week_start = 1
+   ),
+   duracion_horas = DURACION_min / 60
+ ) %>%
+ group_by(id_cuadrante, semana) %>%
+ summarise(
+ 
+   # Coordenadas del cuadrante
+   latitud = first(LATITUD),
+   longitud = first(LONGITUD),
+   altitud = first(ALTITUD),
+ 
+   usuarios_afectados = sum(
+     CANTIDAD_USUARIOS,
+     na.rm = TRUE
+   ),
+ 
+   elementos_afectados = sum(
+     CANTIDAD_ELEMENTOS,
+     na.rm = TRUE
+   ),
+
+      # Variables climáticas semanales
+   temp_media_semana = mean(
+     temperatura_media_c,
+     na.rm = TRUE
+   ),
+ 
+   temp_max_semana = max(
+     temperatura_maxima_c,
+     na.rm = TRUE
+   ),
+ 
+   temp_min_semana = min(
+     temperatura_minima_c,
+     na.rm = TRUE
+   ),
+ 
+   humedad_media_semana = mean(
+     humedad_relativa_pct,
+     na.rm = TRUE
+   ),
+ 
+   viento_medio_semana = mean(
+     velocidad_viento_ms,
+     na.rm = TRUE
+   ),
+ 
+   viento_max_semana = max(
+     velocidad_viento_ms,
+     na.rm = TRUE
+   ),
+ 
+   precip_total_semana = sum(
+     precipitacion_total_mm,
+     na.rm = TRUE
+   ),
+# Variables de fallas
+   n_eventos = sum(FRECUENCIA, na.rm = TRUE),
+ 
+   duracion_total = sum(
+     duracion_horas,
+     na.rm = TRUE
+   ),
+
+   .groups = "drop"
+ )
+
+```
+
+
+```{r}
+head(eventos_cuadrante_semana)
+
+# exportar a la ubicacion UBICACION_DATA
+write_csv(eventos_cuadrante_semana, file.path(UBICACION_DATA, "data_agrupada_por_cuadrante_semana.csv"))
+
+```
+

@@ -1,0 +1,44 @@
+---
+title: "Identificacion de valores extremos"
+author: "Edwin Henao"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+# Etapa 3 — Identificación de valores extremos (Sección 5.3.3)
+
+Panel consolidado **activo × día** (`data_consolidada.csv`).  
+Referencia metodológica: $N = A \times T = 47\,649 \times 1\,826 = 87\,007\,074$ filas.
+
+```{r setup}
+library(tidyverse)
+```
+
+```{r entorno}
+env_path <- file.path("..", "..", ".env")
+if (file.exists(".env")) {
+  readRenviron(".env")
+} else if (file.exists(env_path)) {
+  readRenviron(env_path)
+}
+
+UBICACION_DATA <- Sys.getenv("UBICACION_DATA")
+if (UBICACION_DATA == "") {
+  stop("UBICACION_DATA no esta definida. Verifica el archivo .env.")
+}
+
+path_consolidada <- file.path(UBICACION_DATA, "data_consolidada.csv")
+if (!file.exists(path_consolidada)) {
+  stop("No se encontro: ", path_consolidada)
+}
+```
+
+```{r lectura}
+message("Leyendo panel consolidado (puede tardar varios minutos)...")
+tabla_base_consolidada <- read_csv(path_consolidada, show_col_types = FALSE)
+
+dim(tabla_base_consolidada)
+```

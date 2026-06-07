@@ -1,0 +1,181 @@
+
+
+\PassOptionsToPackage{table}{xcolor} % to use colors in tables
+\PassOptionsToPackage{pdfa}{hyperref}
+\documentclass{unipd-thesis-modern} % src: https://github.com/baronefr/unipd-
+
+
+% additional packages
+\usepackage{lipsum} % for DEMO only
+\usepackage{threeparttable}
+\usepackage{threeparttable}
+\usepackage{siunitx}
+\usepackage[titles]{tocloft} % to modify spacing in toc chapters
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{array}
+\usepackage[utf8]{inputenc}
+\usepackage{titlesec} % Paquete para controlar espaciado de títulos
+\usepackage{graphicx}
+\usepackage{float} % para usar [H] si quieres fijar la figura
+\usepackage{geometry}
+\usepackage{pdflscape}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{listings}
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\usepackage{longtable}
+
+\definecolor{codebg}{RGB}{248,249,251}
+\definecolor{codeframe}{RGB}{210,214,220}
+\definecolor{codekw}{RGB}{17,87,158}
+\definecolor{codecom}{RGB}{93,109,126}
+\definecolor{codestr}{RGB}{135,54,0}
+\definecolor{codenum}{RGB}{120,120,120}
+
+\lstdefinestyle{thesiscode}{
+    basicstyle=\ttfamily\footnotesize,
+    frame=single,
+    framerule=0.4pt,
+    rulecolor=\color{codeframe},
+    backgroundcolor=\color{codebg},
+    breaklines=true,
+    breakatwhitespace=false,
+    columns=fullflexible,
+    keepspaces=true,
+    showstringspaces=false,
+    upquote=true,
+    numbers=left,
+    numberstyle=\scriptsize\color{codenum},
+    numbersep=6pt,
+    keywordstyle=\bfseries\color{codekw},
+    commentstyle=\itshape\color{codecom},
+    stringstyle=\color{codestr},
+    tabsize=2,
+    xleftmargin=0.6em,
+    xrightmargin=0.2em,
+    framexleftmargin=0.5em,
+    aboveskip=0.7em,
+    belowskip=0.7em,
+    captionpos=b,
+    abovecaptionskip=0.4em,
+    belowcaptionskip=0.2em
+}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstdefinestyle{code}{
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue},
+    commentstyle=\color{gray},
+    stringstyle=\color{green!50!black},
+    numbers=left,
+    numberstyle=\tiny,
+    breaklines=true,
+    frame=single
+}
+
+
+
+\setlength{\cftbeforechapskip}{7pt}
+\setcounter{tocdepth}{4} % ToC depth
+
+
+% titles
+\title{Metodología Basada en Métodos de Ciencia de Datos para Predecir los Indicadores de Calidad del Servicio (SAIDI y SAIFI) en Redes de Distribución de una Empresa de Energía Eléctrica en el Norte de Santander}
+\thesisHeader{Pontificia Universidad Javeriana Cali \\Facultad de Ingeniería y Ciencias.\\MAESTRÍA EN CIENCIA DE DATOS}
+\academicYear{07-2024/11-2024}
+
+% student
+\author{Edwin Henao Ochoa\\
+Cindy Lugo Rozo\\
+Edwin Silva Salas}
+
+% supervisor(s)Zürich
+\advisor{Sandra Milena Ramírez Buelvas}{Pontificia Universidad Javeriana} % (mandatory)
+%\coadvisor{xxxxx }{xxxxx} 
+% (optional, comment to remove)
+%\otheradvisor{Prof. Paolino Paperino}{University of Padua} % (optional, comment to remove)
+% ^ NOTE: you can use optional arg to customize the label "Internal Supervisor"
+%   example:   \otheradvisor[The best supervisor!]{Prof. Paolino Paperino}{University of Padua}
+
+% dedication (comment to remove)
+\dedication{\textit{A nuestras familias y amigos \\ Edwin Henao Ochoa\\
+Cindy Lugo Rozo\\
+Edwin Silva Salas}}
+
+% custom symbols (optional)
+\input{custom-symbols}
+
+% bibliography file
+\addbibresource{refs.bib}
+
+\sisetup{
+  output-decimal-marker = {.},
+  group-separator = {,},
+  detect-all = true
+}
+
+
+% Enlaces a informes reproducibles (GitHub Pages)
+\newcommand{\urlconsolidada}{https://esilvas1.github.io/DataCollection_Tesis_MCD/Scripts/Edwin/Consolidada.html}
+\newcommand{\urlagrupacion}{https://esilvas1.github.io/DataCollection_Tesis_MCD/Scripts/Cindy/data_agrupacion.html}
+
+% Ajustes de espacio
+\titlespacing*{\subsection}{0pt}{10pt plus 2pt minus 2pt}{5pt}
+\titlespacing*{\subsubsection}{0pt}{5pt plus 2pt minus 2pt}{3pt}
+% Otros paquetes y configuraciones
+\setlength{\intextsep}{6pt}      % Espacio entre texto y figuras
+\setlength{\textfloatsep}{6pt}   % Espacio entre texto y flotantes
+
+
+\begin{document}
+\renewcommand{\tablename}{Tabla}
+\renewcommand{\listfigurename}{Lista de figuras}
+\renewcommand{\listtablename}{Lista de tablas}
+    \frontmatter
+    % --------------------------
+    \input{chapters/introduction}
+    \newpage
+    % --------------------------
+    \mainmatter
+    % --------------------------
+    \chapter{Definición del problema}
+    \input{chapters/planteamiento-problema}
+    \newpage
+    \input{chapters/formulacion-problema}
+    % --------------------------
+    \chapter{Objetivos del proyecto} % 
+    \input{chapters/objetivo-general}
+    \input{chapters/objetivos-especificos}
+    % --------------------------
+    \chapter{Marco de referencia}
+    \input{chapters/marco-teorico}
+    \input{chapters/antecedentes}
+    % --------------------------
+    \chapter{Datos}
+        \input{chapters/datos}
+    % --------------------------
+    \chapter{Metodología}
+        \input{chapters/metodologia}
+     % --------------------------
+     \chapter{Resultados}
+     \input{chapters/resultados}
+    % --------------------------
+    \chapter{Discusión y trabajo futuro}
+    \input{chapters/discusion}
+   % --------------------------
+    \chapter{Conclusiones}
+    \input{chapters/conclusiones}
+   % --------------------------
+    \clearpage
+    \printbibliography
+    % --------------------------
+     \begin{appendices}
+    \chapter{Appendix}
+        \input{chapters/appendice}
+    \end{appendices}
+\end{document}
