@@ -45,3 +45,8 @@ logs/*.txt
 *.csv
 *.pdf
 *.xlsx
+*.rdb
+*.png
+*.rdx
+*.RData
+Scripts/Cindy/v4/panel_saidi_saifi_cuadrantes_reales_cache/html/__packages
